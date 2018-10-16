@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mattn/go-runewidth"
 	"github.com/nsf/termbox-go"
+	_ "os"
 	"unicode/utf8"
 )
 
@@ -226,7 +228,7 @@ func (eb *EditBox) CursorX() int {
 
 var edit_box EditBox
 
-const edit_box_width = 30
+const edit_box_width = 80
 
 func redraw_all() {
 	const coldef = termbox.ColorDefault
@@ -236,15 +238,25 @@ func redraw_all() {
 	midy := h / 2
 	midx := (w - edit_box_width) / 2
 
+	termbox.SetCell(0, 0, '好', termbox.ColorDefault, termbox.ColorDefault)
+	termbox.SetCell(w-1, 0, 'B', termbox.ColorDefault, termbox.ColorDefault)
+	//termbox.SetCell(w-1, 0, '你', termbox.ColorDefault, termbox.ColorDefault) // 汉字不知为何不支持
+	termbox.SetCell(0, h-1, 'C', termbox.ColorDefault, termbox.ColorDefault)
+	termbox.SetCell(w-1, h-1, 'D', termbox.ColorDefault, termbox.ColorDefault)
+
 	// unicode box drawing chars around the edit box
-	termbox.SetCell(midx-1, midy, '│', coldef, coldef)
+	termbox.SetCell(midx-1, midy, '你', coldef, coldef)
 	termbox.SetCell(midx+edit_box_width, midy, '│', coldef, coldef)
 	termbox.SetCell(midx-1, midy-1, '┌', coldef, coldef)
 	termbox.SetCell(midx-1, midy+1, '└', coldef, coldef)
 	termbox.SetCell(midx+edit_box_width, midy-1, '┐', coldef, coldef)
 	termbox.SetCell(midx+edit_box_width, midy+1, '┘', coldef, coldef)
-	fill(midx, midy-1, edit_box_width, 1, termbox.Cell{Ch: '─'})
-	fill(midx, midy+1, edit_box_width, 1, termbox.Cell{Ch: '─'})
+	//fill(midx, midy-1, edit_box_width, 1, termbox.Cell{Ch: '─'})
+	//fill(midx, midy+1, edit_box_width, 1, termbox.Cell{Ch: '─'})
+
+	fmt.Printf("Hello, World! 你好\n")
+	fmt.Printf("Line2\n")
+	fmt.Printf("Line3\n")
 
 	edit_box.Draw(midx, midy, edit_box_width, 1)
 	termbox.SetCursor(midx+edit_box.CursorX(), midy)
@@ -260,6 +272,17 @@ func main() {
 	}
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputEsc)
+	/*
+		fmt.Printf("size: w=%d,h=%d\n",w, h)
+		for ly := 0; ly < h; ly++ {
+			for lx := 0; lx < w; lx++ {
+				termbox.SetCell(x+lx, y+ly, cell.Ch, termbox.ColorDefault, termbox.ColorDefault)
+			}
+		}
+		termbox.Flush()
+		termbox.Close()
+		os.Exit(-1)
+	*/
 
 	redraw_all()
 mainloop:

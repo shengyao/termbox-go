@@ -2,13 +2,14 @@
 
 package termbox
 
-import "github.com/mattn/go-runewidth"
+import "github.com/shengyao/go-runewidth"
 import "fmt"
 import "os"
 import "os/signal"
 import "syscall"
 import "runtime"
 import "time"
+import "unicode/utf8" // add by shengyao
 
 // public API
 
@@ -234,11 +235,30 @@ func SetCell(x, y int, ch rune, fg, bg Attribute) {
 	back_buffer.cells[y*back_buffer.width+x] = Cell{ch, fg, bg}
 }
 
+// 为了方便加个这函数，SetString
+// Added by Shengyao, 2018-06-06
+func SetString(x, y int, str string) {
+	var c rune
+	var cnt int
+	for i, w := 0, 0; i < len(str); i += w {
+		c, w = utf8.DecodeRuneInString(str[i:])
+		//fmt.Printf("%U begins at byte %03d, ends at byte %03d: ", runeValue, i, i+width - 1)
+		//fmt.Printf("%q\n", c)
+		SetCell(x+cnt+1,y,c,ColorDefault,ColorDefault)
+		cnt ++
+	}
+}
+
 // Returns a slice into the termbox's back buffer. You can get its dimensions
 // using 'Size' function. The slice remains valid as long as no 'Clear' or
 // 'Flush' function calls were made after call to this function.
 func CellBuffer() []Cell {
 	return back_buffer.cells
+}
+
+// 怕 Size() 可能不同步，加个这个
+func CellBufferSize() (int, int) {
+	return back_buffer.width, back_buffer.height
 }
 
 // After getting a raw event from PollRawEvent function call, you can parse it
